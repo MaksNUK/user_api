@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  user_api:
+    build: .
+    environment:
+      - DOCKER=docker
+    container_name: user_api
+    command: gunicorn --bind 0.0.0.0:8999 app:app -w 4
+    ports:
+    - "8999:8999"
+    volumes:
+    - .:/user_api
+    restart: on-failure
+    depends_on:
+      - db
+
+  db:
+    container_name: user_api_db
+    image: percona:8.0.23-14
+    restart: always
+    networks:
+      - default
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=secretpassword
+      - MYSQL_DATABASE=user_api_db
